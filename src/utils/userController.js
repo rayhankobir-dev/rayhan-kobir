@@ -20,16 +20,13 @@ export function registerUser(name, userName, password) {
 }
 
 export function loginUser(userName, password) {
-    const existingUsers = JSON.parse(localStorage.getItem('users')) || [];
-    bcryptjs.compareSync
-    const user = existingUsers.find(u => (u.userName === userName) && bcryptjs.compareSync(password, u.password));
-  
-    if (user) {
-        localStorage.setItem('auth', JSON.stringify({ state: true, user: user.id}));
-        return { success: true, message: 'Login successful', data: user };
+    try {
+        const users = JSON.parse(localStorage.getItem('users'));
+        const user = users.find(user => user.userName === userName && bcryptjs.compareSync(password, user.password));
+        return { success: true, message: 'Login successfully!', data: user };
+    } catch(err) {
+        return { success: false, message: 'Invalid credentials!', data: null };
     }
-  
-    return { success: false, message: 'Invalid credentials', data: null };
 }
   
 // function to check if a user is authenticated
@@ -65,53 +62,19 @@ export function userNameExist(userName) {
     }
 }
 
-export function updateUserInfo(id, info) {
+export function updateUserData(id, info) {
     try {
-        const users = JSON.parse(localStorage.getItem('users'));
-        const user = users.find((user) => user.id === id);
-        const updatedUser = {
-            id: user.id,
-            ...info
-        };
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const index = users.findIndex((user) => user.id === id);
 
-        const updatedUsers = users.map(item => item.id === id ? updateUser : user);
+        if (index === -1) return { success: false, message: 'User not found!', data: {} };
 
-        localStorage.setItem('users', JSON.stringify(updatedUsers));
-        return { success: true, message: 'Information updated.', data: updatedUser };
-    } catch(err) {
-        return { success: false, message: 'Failed to updated information!', data: {} };
+        users[index] = { ...users[index], ...info };
+        localStorage.setItem('users', JSON.stringify(users));
+
+        return { success: true, message: 'Information updated.', data: users[index] };
+    } catch (err) {
+        return { success: false, message: 'Failed to update information!', data: {} };
     }
 }
 
-export function updateUser(updates) {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    console.log(currentUser);
-    if (!currentUser) {
-        return { success: false, message: 'User not logged in' };
-    }
-  
-    // update user data with the provided updates
-    Object.assign(currentUser, updates);
-  
-    // store the updated user data in localStorage
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    return { success: true, message: 'User information updated successfully' };
-}
-
-export function updateUserImage(id, image = '/public/vite.svg') {
-    try {
-        const users = JSON.parse(localStorage.getItem('users'));
-        const user = users.find((user) => user.id === id);
-        const updatedUser = {
-            ...user,
-            avatar: image
-        };
-
-        const updatedUsers = users.map(item => item.id === id ? updateUser : user);
-        localStorage.setItem('users', JSON.stringify(updatedUsers));
-
-        return { success: true, message: 'Successfully avatar updated!', data: updatedUser };
-    } catch(err) {
-        return { success: false, message: 'Failed to updated avatar!', data: {} };
-    }
-}

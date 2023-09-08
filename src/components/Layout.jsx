@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 
 import { LiaBarsSolid } from 'react-icons/lia';
 import { BsPlusLg } from 'react-icons/bs';
@@ -19,12 +19,7 @@ export default function Layout({ children }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const { auth, logout } = useAuth();
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        logout()
-        navigate('/login', { replace: true })
-    }
+    const { user } = auth;
 
     return (
         <div className="flex max-h-screen overflow-hidden">
@@ -78,16 +73,16 @@ export default function Layout({ children }) {
                                     </button>
                                 </div>
                                 <div className="relative ml-3">
-                                    <button onClick={()=> setIsMenuOpen(currentState => !currentState)} type="button" className="relative flex rounded-full bg-gray-300 text-sm p-2 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
-                                        { auth?.profileImage ? <AiOutlineUser className='h-4 w-4 text-red-700'/> : <AiOutlineUser className='h-4 w-4 text-gray-700'/> }
+                                    <button onClick={()=> setIsMenuOpen(currentState => !currentState)} type="button" className="relative flex rounded-full bg-gray-300 text-sm p-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                        { user.avatar ? <img src={user.avatar} className='h-8 w-8 rounded-full'/> : <AiOutlineUser className='h-4 w-4 text-gray-700'/> }
                                     </button>
                                     <div className={`${isMenuOpen ? 'flex' : 'hidden'} absolute border right-0 z-10 mt-4 w-48 flex-col dvide-y origin-top-right rounded-md bg-white overflow-hidden shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-sm`}>
                                         <div className='px-4 py-2 bg-gray-100'>
-                                            <p className="text-md font-semibold text-gray-700 ">{ auth.name }</p>
-                                            <p className=''>{ auth.userName }</p>
+                                            <p className="text-md font-semibold text-gray-700 ">{ user.name }</p>
+                                            <p className=''>{ user.userName }</p>
                                         </div>
                                         <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700">Your Profile</Link>
-                                        <button onClick={handleLogout} type="button" className="block px-4 py-2 text-sm text-left text-gray-700">Sign out</button>
+                                        <button onClick={logout} type="button" className="block px-4 py-2 text-sm text-left text-gray-700">Sign out</button>
                                     </div>
                                 </div>
                             </div>

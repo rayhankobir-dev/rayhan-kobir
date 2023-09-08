@@ -21,7 +21,7 @@ export default function Register() {
     };
 
     return (
-        <main className="min-h-screen grid grid-cols-1 md:grid-cols-2 justify-between">
+        <main className="px-4 md:px-0 min-h-screen grid grid-cols-1 md:grid-cols-2 justify-between">
             <section className="flex h-full flex-1 flex-col">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm text mt-5 md:mt-12 lg:mt-24">
                     <h2 className="text-2xl font-bold leading-9 tracking-tight text-gray-900">
@@ -77,7 +77,7 @@ export default function Register() {
                     </p>
                 </div>
             </section>
-            <section className="flex items-center px-2">
+            <section className="hidden md:flex items-center px-2">
                 <img className="w-full max-h-screen" src={'/public/timer-bg.png'}/>
             </section>
         </main>

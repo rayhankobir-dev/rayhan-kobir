@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { loginUser } from "../utils/userController";
 import { useAuth } from "../hooks/useAuth";
@@ -7,21 +7,23 @@ import { useAuth } from "../hooks/useAuth";
 export default function Login() {
     const [ userName, setUsername ] = useState('');
     const [ password, setPassword ] = useState('');
-    const navigate = useNavigate();
-    const { login } = useAuth();
+    const { updateLoginStatus } = useAuth();
 
     const handleLogin = (e) => {
         e.preventDefault();
 
-        const res = loginUser(userName, password);
-        login(res.data);
-        toast.success('You are logged in!');
-        navigate('/', { replace: true })
+        const response = loginUser(userName, password);
+        if(response.success) {
+            updateLoginStatus(response.data);
+            toast.success(response.message);
+        }else {
+            toast.error(response.message);
+        }
     };
 
     return (
         <main className="max-h-screen grid grid-cols-1 md:grid-cols-2 justify-between">
-            <section className="flex flex-1 flex-col">
+            <section className="flex flex-1 flex-col px-4 md:px-0">
                 <div className="sm:mx-auto sm:w-full sm:max-w-sm text mt-5 md:mt-12 lg:mt-24">
                     <h2 className="text-2xl font-bold leading-9 tracking-tight text-gray-900">
                         Login a new account

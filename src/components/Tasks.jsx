@@ -4,15 +4,20 @@ import PageTitle from "./PageTitle";
 import SingleTask from "./Task";
 import { BsSearch } from 'react-icons/bs'
 import { getAllTasks } from "../utils/taskController";
+import Select from 'react-select';
+
 
 
 
 export default function Tasks() {
     const [ tasks, setTasks ] = useState([]);
-    const [filteredTasks, setFilteredTasks] = useState([]);
-    const [searchText, setSearchText] = useState('');
-    const [priorityFilter, setPriorityFilter] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
+    const [ filteredTasks, setFilteredTasks] = useState([]);
+
+    const [ searchText, setSearchText] = useState('');
+    const [ priority, setPriority] = useState('');
+    const [ status, setStatus] = useState('');
+    const [ team, setTeam] = useState('');
+    const [ timeline, setTimeLine] = useState((new Date().getDate()));
 
     useEffect(() => {
         const fetchData = async () => {
@@ -26,13 +31,16 @@ export default function Tasks() {
 
     useEffect(() => {
         const filtered = tasks.filter(task => (
-            (priorityFilter === '' || task.priority === priorityFilter) &&
-            (statusFilter === '' || task.status === statusFilter) &&
+            (priority === '' || task.priority === priority) &&
+            (status === '' || task.status === status) &&
+            // (timeline !== '' && new Date(task.timeline ) <= new Date(timeline)) &&
             (searchText === '' || task.title.toLowerCase().includes(searchText.toLowerCase()))
         ));
         setFilteredTasks(filtered);
 
-    }, [tasks, priorityFilter, statusFilter, searchText]);
+        console.log(filtered, priority, status, searchText)
+
+    }, [tasks, priority, status, searchText, team, timeline]);
     
     return (
         <Layout>
@@ -46,28 +54,52 @@ export default function Tasks() {
                         <BsSearch/>
                         <input value={searchText} onChange={(e) => setSearchText(e.target.value)} className="w-full h-full outline-none focus:outline-none focus:border-blue-400 text-sm" type="text" placeholder="Search by title" />
                     </div>
-                    <div className="flex gap-2">
-                        <div className="border rounded-md px-2">
-                            <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)} className="h-full w-fit outline-none focus:outline-none focus:border-blue-400 text-sm">
-                                <option disabled={true}>Priority</option>
-                                <option value="high">High</option>
-                                <option value="moderate">Moderate</option>
-                                <option value="low">Low</option>
-                            </select>
-                        </div>
-                        <div className="border rounded-md px-2">
-                            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-full w-fit outline-none focus:outline-none focus:border-blue-400 text-sm">
-                                <option disabled={true}>Status</option>
-                                <option value="created">Created</option>
-                                <option value="progress">Progress</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                        </div>
-                        <input className="border h-10 px-2 rounded-md outline-none focus:outline-none focus:border-blue-400" type="date" name="timeline"/>
+                    <div className="flex gap-1">
+                            <Select
+                                value={priority}
+                                onChange={({value}) => setPriority(value)}
+                                options={
+                                    [
+                                        { value: '', label: 'All'},
+                                        { value: 'low', label: 'Low' },
+                                        { value: 'moderate', label: 'Moderate' },
+                                        { value: 'high', label: 'High' }
+                                    ]
+                                }
+                            />
+                            
+                            <Select
+                                value={status}
+                                onChange={({value}) => setStatus(value)}
+                                options={
+                                    [
+                                        { value: '', label: 'All'},
+                                        { value: 'created', label: 'Created' },
+                                        { value: 'progress', label: 'Progress' },
+                                        { value: 'completed', label: 'Completed' }
+                                    ]
+                                }
+                            />
+                            <Select
+                                value={team}
+                                onChange={({value}) => setTeam(value)}
+                                options={
+                                    [
+                                        { value: '', label: 'All'},
+                                        { value: 'dx', label: 'DX' },
+                                        { value: 'ui', label: 'UI' },
+                                        { value: 'dev', label: 'DEV' }
+                                    ]
+                                }
+                            />
+                        <input value={timeline} onChange={(e) => setTimeLine(e.target.value)} className="border h-10 px-2 rounded-md outline-none focus:outline-none focus:border-blue-400" type="date" name="timeline"/>
                     </div>
                 </div>
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-6 overflow-auto'>
-                    { filteredTasks?.map((task) => <SingleTask key={task.id} task={task}/> ) }
+                    { 
+                        filteredTasks.length > 0 ? filteredTasks.map((task) => <SingleTask key={task.id} task={task}/> ) 
+                        : <p className="bg-red-50 text-red-500 sm:col-span-full rounded-md px-4 py-3">Not found!</p> 
+                    }
                 </div>
             </section>
         </Layout>

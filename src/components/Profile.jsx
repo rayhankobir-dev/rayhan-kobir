@@ -2,11 +2,13 @@ import { FaUserCircle } from 'react-icons/fa';
 import Layout from './Layout';
 import PageTitle from './PageTitle';
 import { useEffect, useState } from 'react';
-import { updateUserImage } from '../utils/userController';
+import { updateUserData } from '../utils/userController';
 import { toast } from 'react-toastify';
+import { useAuth } from '../hooks/useAuth';
 
-const auth = {};
 export default function Profile() {
+  const { auth, updateUserInfo } = useAuth();
+  const { user } = auth;
   const [formData, setFormData] = useState({
     name: '',
     userName: '',
@@ -24,27 +26,47 @@ export default function Profile() {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    // const response = updateUserInfo(auth.id, formData);
-    // if(response.success) {
-    //   setFormData(response.data)
-    //   toast.success(response.message);
-    // }else {
-    //   toast.error(response.message);
-    // }
-  }
 
-  const updateUserAvatar = () => {
-    const response = updateUserImage();
+    const response = updateUserData(user.id, formData);
     if(response.success) {
+      updateUserInfo(response.data)
       toast.success(response.message);
     }else {
       toast.error(response.message);
     }
   }
 
+  const updateUserAvatar = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+
+    fileInput.addEventListener('change', (e) => {
+      const selectedFile = e.target.files[0];
+
+      if (selectedFile) {
+        const reader = new FileReader();
+
+        reader.onload = (readerEvent) => {
+          const avatarData = readerEvent.target.result;
+          
+          const response = updateUserData(user.id, { avatar: avatarData });
+          if(response.success) {
+            updateUserInfo({ ...user, avatar: avatarData });
+            toast.success(response.message);
+          }else {
+            toast.error(response.message);
+          }
+
+        };
+        reader.readAsDataURL(selectedFile);
+      }
+    });
+    fileInput.click();
+  };
+
   useEffect(() => {
-    // const user = userNameExist(auth.userName);
-    // setFormData(user)
+    setFormData(user)
   }, []);
 
   return (
@@ -62,7 +84,7 @@ export default function Profile() {
                 Photo
               </label>
               <div className="mt-2 flex items-center gap-x-3">
-                { auth?.avatar? 'Avatar' : <FaUserCircle className="h-12 w-12 text-gray-300" aria-hidden="true" />}
+                { user?.avatar? <img src={user.avatar} alt="Avatar" className="h-12 w-12 rounded-full" /> : <FaUserCircle className="h-12 w-12 text-gray-300" aria-hidden="true" />}
                 <button
                   type="button"
                   onClick={updateUserAvatar}
@@ -117,7 +139,7 @@ export default function Profile() {
                   name='bio'
                   value={formData.bio}
                   onChange={handleChange}
-                  className="block w-full rounded-md border-0 py-1.5 focus:outline-none text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="px-3 block w-full rounded-md border-0 py-1.5 focus:outline-none text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
               <p className="mt-1 text-sm leading-6 text-gray-600">Write a few sentences about yourself.</p>
