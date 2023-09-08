@@ -69,7 +69,7 @@ export default function Login() {
                 </div>
             </section>
             <section className="hidden md:flex h-full items-center px-2">
-                <img className="w-full max-h-screen" src={'/public/timer-bg.png'}/>
+                <img className="w-full max-h-screen" src='/timer-bg.png'/>
             </section>
         </main>
     )
