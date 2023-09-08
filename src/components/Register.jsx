@@ -78,7 +78,7 @@ export default function Register() {
                 </div>
             </section>
             <section className="hidden md:flex items-center px-2">
-                <img className="w-full max-h-screen" src={'/public/timer-bg.png'}/>
+                <img className="w-full max-h-screen" src='/timer-bg.png'/>
             </section>
         </main>
     )
